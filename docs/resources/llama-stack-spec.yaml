@@ -4854,26 +4854,15 @@ components:
     SyntheticDataGenerateRequest:
       type: object
       properties:
-        dialogs:
+        provider_config:
           type: array
           items:
             $ref: '#/components/schemas/Message'
-        filtering_function:
-          type: string
-          enum:
-            - none
-            - random
-            - top_k
-            - top_p
-            - top_k_top_p
-            - sigmoid
-          title: The type of filtering function.
         model:
           type: string
       additionalProperties: false
       required:
-        - dialogs
-        - filtering_function
+        - provider_config
     SyntheticDataGenerationResponse:
       type: object
       properties:

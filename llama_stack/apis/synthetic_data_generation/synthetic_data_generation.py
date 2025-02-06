@@ -28,10 +28,9 @@ class FilteringFunction(Enum):
 
 @json_schema_type
 class SyntheticDataGenerationRequest(BaseModel):
-    """Request to generate synthetic data. A small batch of prompts and a filtering function"""
+    """Request to generate synthetic data."""
 
-    dialogs: List[Message]
-    filtering_function: FilteringFunction = FilteringFunction.none
+    provider_config: Dict[str, Any]
     model: Optional[str] = None
 
 
@@ -47,7 +46,6 @@ class SyntheticDataGeneration(Protocol):
     @webmethod(route="/synthetic-data-generation/generate")
     def synthetic_data_generate(
         self,
-        dialogs: List[Message],
-        filtering_function: FilteringFunction = FilteringFunction.none,
+        provider_config: Dict[str, Any],
         model: Optional[str] = None,
     ) -> Union[SyntheticDataGenerationResponse]: ...
