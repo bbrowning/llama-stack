@@ -7,6 +7,7 @@ apis:
 - inference
 - safety
 - scoring
+- synthetic_data_generation
 - telemetry
 - tool_runtime
 - vector_io
@@ -50,6 +51,10 @@ providers:
       sinks: ${env.TELEMETRY_SINKS:console,sqlite}
       sqlite_db_path: ${env.SQLITE_DB_PATH:~/.llama/distributions/ollama/trace_store.db}
   eval:
+  - provider_id: meta-reference
+    provider_type: inline::meta-reference
+    config: {}
+  synthetic_data_generation:
   - provider_id: meta-reference
     provider_type: inline::meta-reference
     config: {}

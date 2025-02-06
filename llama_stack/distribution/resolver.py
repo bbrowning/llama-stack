@@ -13,6 +13,7 @@ from llama_stack.apis.datasetio import DatasetIO
 from llama_stack.apis.datasets import Datasets
 from llama_stack.apis.eval import Eval
 from llama_stack.apis.eval_tasks import EvalTasks
+from llama_stack.apis.synthetic_data_generation import SyntheticDataGeneration
 from llama_stack.apis.inference import Inference
 from llama_stack.apis.inspect import Inspect
 from llama_stack.apis.models import Models
@@ -74,6 +75,7 @@ def api_protocol_map() -> Dict[Api, Any]:
         Api.scoring_functions: ScoringFunctions,
         Api.eval: Eval,
         Api.eval_tasks: EvalTasks,
+        Api.synthetic_data_generation: SyntheticDataGeneration,
         Api.post_training: PostTraining,
         Api.tool_groups: ToolGroups,
         Api.tool_runtime: ToolRuntime,

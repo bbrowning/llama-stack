@@ -18,6 +18,7 @@ class Api(Enum):
     datasetio = "datasetio"
     scoring = "scoring"
     eval = "eval"
+    synthetic_data_generation = "synthetic_data_generation"
     post_training = "post_training"
     tool_runtime = "tool_runtime"
 
