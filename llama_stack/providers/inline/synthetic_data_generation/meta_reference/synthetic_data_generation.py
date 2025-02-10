@@ -90,16 +90,6 @@ class MetaReferenceSyntheticDataGenerationImpl(
             teacher_model_path: str,
             model: str,
     ) -> List[Dict[str, Any]]:
-        # for x in tqdm(input_rows):
-        #     response = await self.inference_api.chat_completion(
-        #         model_id=os.environ["INFERENCE_MODEL"],
-        #         messages=[x],
-        #     )
-        #     generations.append({
-        #         "prompt": x.content,
-        #         "response": response.completion_message.content
-        #     })
-
         date_suffix = (
             datetime.now().replace(microsecond=0).isoformat().replace(":", "_")
         )
@@ -110,21 +100,21 @@ class MetaReferenceSyntheticDataGenerationImpl(
         client = OpenAI(base_url="http://localhost:8000/v1", api_key="EMPTY")
         client.server_supports_batched = True
 
-        # preprocess_taxonomy(
-        #     taxonomy_dir=taxonomy_dir,
-        #     output_dir=preprocessed_dir,
-        #     teacher_model_path=teacher_model_path,
-        # )
+        preprocess_taxonomy(
+            taxonomy_dir=taxonomy_dir,
+            output_dir=preprocessed_dir,
+            teacher_model_path=teacher_model_path,
+        )
 
-        # generate_taxonomy(
-        #     client=client,
-        #     input_dir=preprocessed_dir,
-        #     output_dir=generated_dir,
-        #     pipeline=pipeline,
-        #     model_id=model,
-        #     num_cpus=4,
-        #     batch_size=8,
-        # )
+        generate_taxonomy(
+            client=client,
+            input_dir=preprocessed_dir,
+            output_dir=generated_dir,
+            pipeline=pipeline,
+            model_id=model,
+            num_cpus=4,
+            batch_size=8,
+        )
 
         postprocess_taxonomy(
             input_dir=generated_dir,
