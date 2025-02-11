@@ -15,23 +15,12 @@ from pydantic import BaseModel
 from llama_stack.apis.inference import Message
 
 
-class FilteringFunction(Enum):
-    """The type of filtering function."""
-
-    none = "none"
-    random = "random"
-    top_k = "top_k"
-    top_p = "top_p"
-    top_k_top_p = "top_k_top_p"
-    sigmoid = "sigmoid"
-
-
 @json_schema_type
 class SyntheticDataGenerationRequest(BaseModel):
     """Request to generate synthetic data."""
 
-    provider_config: Dict[str, Any]
-    model: Optional[str] = None
+    dataset_id: str
+    pipeline_id: str
 
 
 @json_schema_type
@@ -46,6 +35,6 @@ class SyntheticDataGeneration(Protocol):
     @webmethod(route="/synthetic-data-generation/generate")
     def synthetic_data_generate(
         self,
-        provider_config: Dict[str, Any],
-        model: Optional[str] = None,
+        dataset_id: str,
+        pipeline_id: str,
     ) -> Union[SyntheticDataGenerationResponse]: ...

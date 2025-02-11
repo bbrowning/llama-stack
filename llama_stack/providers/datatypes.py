@@ -15,6 +15,7 @@ from llama_stack.apis.datasets import Dataset
 from llama_stack.apis.datatypes import Api
 from llama_stack.apis.eval_tasks import EvalTask
 from llama_stack.apis.models import Model
+from llama_stack.apis.pipelines import Pipeline
 from llama_stack.apis.scoring_functions import ScoringFn
 from llama_stack.apis.shields import Shield
 from llama_stack.apis.tools import Tool
@@ -51,6 +52,11 @@ class ScoringFunctionsProtocolPrivate(Protocol):
 
 class EvalTasksProtocolPrivate(Protocol):
     async def register_eval_task(self, eval_task: EvalTask) -> None: ...
+
+class PipelinesProtocolPrivate(Protocol):
+    async def register_pipeline(self, pipeline: Pipeline) -> None: ...
+
+    async def unregister_pipeline(self, pipeline_id: str) -> None: ...
 
 
 class ToolsProtocolPrivate(Protocol):

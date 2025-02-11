@@ -22,6 +22,7 @@ from llama_stack.apis.eval_tasks import EvalTasks
 from llama_stack.apis.inference import Inference
 from llama_stack.apis.inspect import Inspect
 from llama_stack.apis.models import Models
+from llama_stack.apis.pipelines import Pipelines
 from llama_stack.apis.post_training import PostTraining
 from llama_stack.apis.safety import Safety
 from llama_stack.apis.scoring import Scoring
@@ -53,6 +54,7 @@ class LlamaStack(
     VectorIO,
     Eval,
     EvalTasks,
+    Pipelines,
     SyntheticDataGeneration,
     Scoring,
     ScoringFunctions,
@@ -79,6 +81,7 @@ RESOURCES = [
         "list_scoring_functions",
     ),
     ("eval_tasks", Api.eval_tasks, "register_eval_task", "list_eval_tasks"),
+    ("pipelines", Api.pipelines, "register_pipeline", "list_pipelines"),
     ("tool_groups", Api.tool_groups, "register_tool_group", "list_tool_groups"),
 ]
 

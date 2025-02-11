@@ -17,7 +17,7 @@ distribution_spec:
     eval:
     - inline::meta-reference
     synthetic_data_generation:
-    - inline::meta-reference
+    - inline::instructlab-sdg
     datasetio:
     - remote::huggingface
     - inline::localfs

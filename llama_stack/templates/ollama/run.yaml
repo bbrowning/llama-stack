@@ -52,8 +52,8 @@ providers:
     provider_type: inline::meta-reference
     config: {}
   synthetic_data_generation:
-  - provider_id: meta-reference
-    provider_type: inline::meta-reference
+  - provider_id: instructlab-sdg
+    provider_type: inline::instructlab-sdg
     config: {}
   datasetio:
   - provider_id: huggingface
@@ -108,6 +108,7 @@ vector_dbs: []
 datasets: []
 scoring_fns: []
 eval_tasks: []
+pipelines: []
 tool_groups:
 - toolgroup_id: builtin::websearch
   provider_id: tavily-search

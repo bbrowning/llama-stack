@@ -7,22 +7,20 @@ from typing import Dict
 
 from llama_stack.distribution.datatypes import Api, ProviderSpec
 
-from .config import MetaReferenceSyntheticDataGenerationConfig
+from .config import InstructLabSDGConfig
 
 
 async def get_provider_impl(
-    config: MetaReferenceSyntheticDataGenerationConfig,
+    config: InstructLabSDGConfig,
     deps: Dict[Api, ProviderSpec],
 ):
-    from .synthetic_data_generation import MetaReferenceSyntheticDataGenerationImpl
+    from .synthetic_data_generation import InstructLabSDGImpl
 
-    impl = MetaReferenceSyntheticDataGenerationImpl(
+    impl = InstructLabSDGImpl(
         config,
         deps[Api.datasetio],
         deps[Api.datasets],
-        deps[Api.scoring],
         deps[Api.inference],
-        deps[Api.agents],
     )
     await impl.initialize()
     return impl

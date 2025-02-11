@@ -16,6 +16,7 @@ class ResourceType(Enum):
     dataset = "dataset"
     scoring_function = "scoring_function"
     eval_task = "eval_task"
+    pipeline = "pipeline"
     tool = "tool"
     tool_group = "tool_group"
 

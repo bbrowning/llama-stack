@@ -1,4 +1,4 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
+ # Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the terms described in the LICENSE file in
@@ -13,6 +13,7 @@ from llama_stack.apis.datasetio import DatasetIO
 from llama_stack.apis.datasets import Datasets
 from llama_stack.apis.eval import Eval
 from llama_stack.apis.eval_tasks import EvalTasks
+from llama_stack.apis.pipelines import Pipelines
 from llama_stack.apis.synthetic_data_generation import SyntheticDataGeneration
 from llama_stack.apis.inference import Inference
 from llama_stack.apis.inspect import Inspect
@@ -42,6 +43,7 @@ from llama_stack.providers.datatypes import (
     EvalTasksProtocolPrivate,
     InlineProviderSpec,
     ModelsProtocolPrivate,
+    PipelinesProtocolPrivate,
     ProviderSpec,
     RemoteProviderConfig,
     RemoteProviderSpec,
@@ -75,6 +77,7 @@ def api_protocol_map() -> Dict[Api, Any]:
         Api.scoring_functions: ScoringFunctions,
         Api.eval: Eval,
         Api.eval_tasks: EvalTasks,
+        Api.pipelines: Pipelines,
         Api.synthetic_data_generation: SyntheticDataGeneration,
         Api.post_training: PostTraining,
         Api.tool_groups: ToolGroups,
@@ -95,6 +98,7 @@ def additional_protocols_map() -> Dict[Api, Any]:
             Api.scoring_functions,
         ),
         Api.eval: (EvalTasksProtocolPrivate, EvalTasks, Api.eval_tasks),
+        Api.synthetic_data_generation: (PipelinesProtocolPrivate, Pipelines, Api.pipelines),
     }
 
 

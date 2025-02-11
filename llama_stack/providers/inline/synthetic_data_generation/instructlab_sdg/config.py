@@ -12,7 +12,7 @@ from llama_stack.providers.utils.kvstore.config import (
 )
 
 
-class MetaReferenceSyntheticDataGenerationConfig(BaseModel):
+class InstructLabSDGConfig(BaseModel):
     kvstore: KVStoreConfig = SqliteKVStoreConfig(
-        db_path=(RUNTIME_BASE_DIR / "meta_reference_synthetic_data_generation.db").as_posix()
-    )  # Uses SQLite config specific to Meta Reference Eval storage
+        db_path=(RUNTIME_BASE_DIR / "instructlab_sdg.db").as_posix()
+    )  # Uses SQLite config specific to localfs storage

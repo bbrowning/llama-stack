@@ -13,6 +13,7 @@ from llama_stack.apis.common.type_system import ParamType
 from llama_stack.apis.datasets import Dataset, Datasets, ListDatasetsResponse
 from llama_stack.apis.eval_tasks import EvalTask, EvalTasks, ListEvalTasksResponse
 from llama_stack.apis.models import ListModelsResponse, Model, Models, ModelType
+from llama_stack.apis.pipelines import Pipeline, Pipelines, ListPipelinesResponse
 from llama_stack.apis.resource import ResourceType
 from llama_stack.apis.scoring_functions import (
     ListScoringFunctionsResponse,
@@ -61,6 +62,8 @@ async def register_object_with_provider(obj: RoutableObject, p: Any) -> Routable
         return await p.register_scoring_function(obj)
     elif api == Api.eval:
         return await p.register_eval_task(obj)
+    elif api == Api.synthetic_data_generation:
+        return await p.register_pipeline(obj)
     elif api == Api.tool_runtime:
         return await p.register_tool(obj)
     else:
@@ -75,6 +78,8 @@ async def unregister_object_from_provider(obj: RoutableObject, p: Any) -> None:
         return await p.unregister_model(obj.identifier)
     elif api == Api.datasetio:
         return await p.unregister_dataset(obj.identifier)
+    elif api == Api.synthetic_data_generation:
+        return await p.unregister_pipeline(obj.identifier)
     elif api == Api.tool_runtime:
         return await p.unregister_tool(obj.identifier)
     else:
@@ -143,6 +148,8 @@ class CommonRoutingTableImpl(RoutingTable):
                 return ("Scoring", "scoring_function")
             elif isinstance(self, EvalTasksRoutingTable):
                 return ("Eval", "eval_task")
+            elif isinstance(self, PipelinesRoutingTable):
+                return ("Pipelines", "pipeline")
             elif isinstance(self, ToolGroupsRoutingTable):
                 return ("Tools", "tool")
             else:
@@ -464,6 +471,49 @@ class EvalTasksRoutingTable(CommonRoutingTableImpl, EvalTasks):
             provider_resource_id=provider_eval_task_id,
         )
         await self.register_object(eval_task)
+
+
+class PipelinesRoutingTable(CommonRoutingTableImpl, Pipelines):
+    async def list_pipelines(self) -> ListPipelinesResponse:
+        return ListPipelinesResponse(data=await self.get_all_with_type(ResourceType.pipeline.value))
+
+    async def get_pipeline(self, pipeline_id: str) -> Optional[Pipeline]:
+        return await self.get_object_by_identifier("pipeline", pipeline_id)
+
+    async def register_pipeline(
+        self,
+        pipeline_id: str,
+        input_dataset_schema: Dict[str, ParamType],
+        provider_pipeline_id: Optional[str] = None,
+        provider_id: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        if provider_id is None:
+            # If provider_id not specified, use the only provider if it supports this pipeline
+            if len(self.impls_by_provider_id) == 1:
+                provider_id = list(self.impls_by_provider_id.keys())[0]
+            else:
+                raise ValueError(
+                    "No provider specified and multiple providers available. Please specify a provider_id."
+                )
+        if provider_pipeline_id is None:
+            provider_pipeline_id = pipeline_id
+        if metadata is None:
+            metadata = {}
+        pipeline = Pipeline(
+            identifier=pipeline_id,
+            provider_id=provider_id,
+            provider_resource_id=provider_pipeline_id,
+            input_dataset_schema=input_dataset_schema,
+            metadata=metadata,
+        )
+        await self.register_object(pipeline)
+
+    async def unregister_pipeline(self, pipeline_id: str) -> None:
+        pipeline = await self.get_pipeline(pipeline_id)
+        if pipeline is None:
+            raise ValueError(f"Pipeline {pipeline_id} not found")
+        await self.unregister_object(pipeline)
 
 
 class ToolGroupsRoutingTable(CommonRoutingTableImpl, ToolGroups):

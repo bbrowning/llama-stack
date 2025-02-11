@@ -296,6 +296,7 @@
     "fastapi",
     "fire",
     "httpx",
+    "instructlab-sdg==0.7.0",
     "matplotlib",
     "nltk",
     "numpy",

@@ -20,7 +20,7 @@ The `llamastack/distribution-ollama` distribution consists of the following prov
 | inference | `remote::ollama` |
 | safety | `inline::llama-guard` |
 | scoring | `inline::basic`, `inline::llm-as-judge`, `inline::braintrust` |
-| synthetic_data_generation | `inline::meta-reference` |
+| synthetic_data_generation | `inline::instructlab-sdg` |
 | telemetry | `inline::meta-reference` |
 | tool_runtime | `remote::brave-search`, `remote::tavily-search`, `inline::code-interpreter`, `inline::rag-runtime` |
 | vector_io | `inline::faiss`, `remote::chromadb`, `remote::pgvector` |

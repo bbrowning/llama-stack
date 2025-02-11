@@ -29,7 +29,7 @@ def get_distribution_template() -> DistributionTemplate:
         "agents": ["inline::meta-reference"],
         "telemetry": ["inline::meta-reference"],
         "eval": ["inline::meta-reference"],
-        "synthetic_data_generation": ["inline::meta-reference"],
+        "synthetic_data_generation": ["inline::instructlab-sdg"],
         "datasetio": ["remote::huggingface", "inline::localfs"],
         "scoring": ["inline::basic", "inline::llm-as-judge", "inline::braintrust"],
         "tool_runtime": [

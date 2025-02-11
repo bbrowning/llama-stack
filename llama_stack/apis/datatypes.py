@@ -30,6 +30,7 @@ class Api(Enum):
     datasets = "datasets"
     scoring_functions = "scoring_functions"
     eval_tasks = "eval_tasks"
+    pipelines = "pipelines"
     tool_groups = "tool_groups"
 
     # built-in API
