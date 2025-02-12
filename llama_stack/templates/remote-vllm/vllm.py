@@ -28,8 +28,9 @@ def get_distribution_template() -> DistributionTemplate:
         "safety": ["inline::llama-guard"],
         "agents": ["inline::meta-reference"],
         "eval": ["inline::meta-reference"],
-        "datasetio": ["remote::huggingface", "inline::localfs"],
+        "datasetio": ["remote::huggingface", "inline::localfs", "remote::instructlab-taxonomy"],
         "scoring": ["inline::basic", "inline::llm-as-judge", "inline::braintrust"],
+        "synthetic_data_generation": ["inline::instructlab-sdg"],
         "telemetry": ["inline::meta-reference"],
         "tool_runtime": [
             "remote::brave-search",

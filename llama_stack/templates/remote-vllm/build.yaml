@@ -17,10 +17,13 @@ distribution_spec:
     datasetio:
     - remote::huggingface
     - inline::localfs
+    - remote::instructlab-taxonomy
     scoring:
     - inline::basic
     - inline::llm-as-judge
     - inline::braintrust
+    synthetic_data_generation:
+    - inline::instructlab-sdg
     telemetry:
     - inline::meta-reference
     tool_runtime:

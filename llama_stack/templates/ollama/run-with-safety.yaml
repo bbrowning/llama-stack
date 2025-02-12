@@ -54,16 +54,15 @@ providers:
   - provider_id: meta-reference
     provider_type: inline::meta-reference
     config: {}
-  synthetic_data_generation:
-  - provider_id: instructlab-sdg
-    provider_type: inline::instructlab-sdg
-    config: {}
   datasetio:
   - provider_id: huggingface
     provider_type: remote::huggingface
     config: {}
   - provider_id: localfs
     provider_type: inline::localfs
+    config: {}
+  - provider_id: instructlab-taxonomy
+    provider_type: remote::instructlab-taxonomy
     config: {}
   scoring:
   - provider_id: basic
@@ -76,6 +75,10 @@ providers:
     provider_type: inline::braintrust
     config:
       openai_api_key: ${env.OPENAI_API_KEY:}
+  synthetic_data_generation:
+  - provider_id: instructlab-sdg
+    provider_type: inline::instructlab-sdg
+    config: {}
   tool_runtime:
   - provider_id: brave-search
     provider_type: remote::brave-search

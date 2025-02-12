@@ -14,11 +14,12 @@ The `llamastack/distribution-remote-vllm` distribution consists of the following
 | API | Provider(s) |
 |-----|-------------|
 | agents | `inline::meta-reference` |
-| datasetio | `remote::huggingface`, `inline::localfs` |
+| datasetio | `remote::huggingface`, `inline::localfs`, `remote::instructlab-taxonomy` |
 | eval | `inline::meta-reference` |
 | inference | `remote::vllm` |
 | safety | `inline::llama-guard` |
 | scoring | `inline::basic`, `inline::llm-as-judge`, `inline::braintrust` |
+| synthetic_data_generation | `inline::instructlab-sdg` |
 | telemetry | `inline::meta-reference` |
 | tool_runtime | `remote::brave-search`, `remote::tavily-search`, `inline::code-interpreter`, `inline::rag-runtime`, `remote::model-context-protocol` |
 | vector_io | `inline::faiss`, `remote::chromadb`, `remote::pgvector` |

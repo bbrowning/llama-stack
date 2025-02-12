@@ -15,7 +15,7 @@ The `llamastack/distribution-ollama` distribution consists of the following prov
 | API | Provider(s) |
 |-----|-------------|
 | agents | `inline::meta-reference` |
-| datasetio | `remote::huggingface`, `inline::localfs` |
+| datasetio | `remote::huggingface`, `inline::localfs`, `remote::instructlab-taxonomy` |
 | eval | `inline::meta-reference` |
 | inference | `remote::ollama` |
 | safety | `inline::llama-guard` |
