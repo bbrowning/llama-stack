@@ -14,7 +14,7 @@ def available_providers() -> List[ProviderSpec]:
         InlineProviderSpec(
             api=Api.synthetic_data_generation,
             provider_type="inline::instructlab-sdg",
-            pip_packages=["instructlab-sdg==0.7.0"],
+            pip_packages=["instructlab-sdg>=0.7.0"],
             module="llama_stack.providers.inline.synthetic_data_generation.instructlab_sdg",
             config_class="llama_stack.providers.inline.synthetic_data_generation.instructlab_sdg.synthetic_data_generation.InstructLabSDGConfig",
             api_dependencies=[
