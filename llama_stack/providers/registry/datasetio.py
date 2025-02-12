@@ -36,4 +36,16 @@ def available_providers() -> List[ProviderSpec]:
                 config_class="llama_stack.providers.remote.datasetio.huggingface.HuggingfaceDatasetIOConfig",
             ),
         ),
+        remote_provider_spec(
+            api=Api.datasetio,
+            adapter=AdapterSpec(
+                adapter_type="instructlab-taxonomy",
+                pip_packages=[
+                    "datasets",
+                    "git",
+                ],
+                module="llama_stack.providers.remote.datasetio.instructlab_taxonomy",
+                config_class="llama_stack.providers.remote.datasetio.instructlab_taxonomy.TaxonomyDatasetIOConfig",
+            ),
+        ),
     ]

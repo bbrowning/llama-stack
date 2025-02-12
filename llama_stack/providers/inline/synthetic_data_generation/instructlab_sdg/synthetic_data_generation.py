@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from datetime import datetime
 import asyncio
+import glob
 import os
 import tempfile
 
@@ -115,100 +116,150 @@ class InstructLabSDGImpl(Pipelines, PipelinesProtocolPrivate):
         )
         print(f"!!! input dataset has {len(all_rows.rows)} rows")
 
-        return await asyncio.to_thread(self._ilab_data_generate, all_rows.rows, pipeline)
-
-        # return await self._ilab_data_generate(
-        # )
-        # client_taxonomy_path = provider_config["taxonomy_dir"]
-        # pipeline = provider_config["pipeline"]
-        # teacher_model_path = provider_config["teacher_model_path"]
-
-        # with tempfile.TemporaryDirectory() as temp_dir:
-        #     taxonomy_dir = f"{temp_dir}/taxonomy"
-        #     shutil.copytree(client_taxonomy_path, taxonomy_dir)
-        #     return await self._ilab_data_generate(
-        #         taxonomy_dir=taxonomy_dir,
-        #         pipeline=pipeline,
-        #         teacher_model_path=teacher_model_path,
-        #         model=model,
-        #     )
-
-    def _ilab_data_generate(
-            self,
-            input_rows: [],
-            pipeline: Pipeline,
-    ) -> List[Dict[str, Any]]:
+        # HACK: hardcoded client for now
         client = OpenAI(base_url="http://localhost:8000/v1", api_key="EMPTY")
         client.server_supports_batched = True
-        pipeline_context = IlabPipelineContext(
-            client=client,
-            model_family="mixtral",
-            model_id="mixtral-foo",
-            num_instructions_to_generate=30,
+        if all_rows.rows and all_rows.rows[0]["qna_path"]:
+            # Entire e2e data generation
+            return await asyncio.to_thread(
+                self._ilab_data_generate,
+                all_rows.rows,
+                pipeline,
+                client,
+            )
+
+        return await asyncio.to_thread(
+            # Just running a single pipeline
+            self._ilab_run_pipeline,
+            all_rows.rows,
+            pipeline,
+            client,
         )
 
+    def _ilab_run_pipeline(
+        self,
+        input_rows: [],
+        pipeline: Pipeline,
+        client,
+    ) -> List[Dict[str, Any]]:
+        ##
+        ## Example of running only a single pipeline
+        ##
+        ## This expects input_rows to NOT be an entire taxonomy
+        ##
+        pipeline_context = IlabPipelineContext(
+            client=client,
+            model_family=pipeline.metadata.get("model_family", "mixtral"),
+            model_id=pipeline.metadata["model_id"],
+            num_instructions_to_generate=30,
+        )
         temp_file_path = os.path.join(self.tempdir, f"{pipeline.pipeline_id}.yaml")
         with open(temp_file_path, "w", encoding="utf-8") as temp_file:
             temp_file.write(pipeline.metadata["pipeline_yaml"])
         ilab_pipeline = IlabPipeline.from_file(pipeline_context, temp_file_path)
-        # HACK to just deal with 3 rows for testing
+        # HACK to just deal with 3 rows for testing expediency
         input_ds = Dataset.from_list(input_rows[0:3])
-        output_ds = ilab_pipeline.generate(input_ds, "foo")
+        output_ds = ilab_pipeline.generate(input_ds)
         return output_ds
 
-        # date_suffix = (
-        #     datetime.now().replace(microsecond=0).isoformat().replace(":", "_")
-        # )
-        # preprocessed_dir = "preprocessed"
-        # generated_dir = "generated"
-        # postprocessed_dir = "postprocessed"
+    def _ilab_data_generate(
+        self,
+        input_rows: [],
+        pipeline: Pipeline,
+        client,
+    ) -> List[Dict[str, Any]]:
 
-        # client = OpenAI(base_url="http://localhost:8000/v1", api_key="EMPTY")
-        # client.server_supports_batched = True
+        ##
+        ## Example of running entire e2e ilab data generate
+        ##
+        ## This expects input_rows to contain the entire taxonomy
+        ##
+        date_suffix = (
+            datetime.now().replace(microsecond=0).isoformat().replace(":", "_")
+        )
+        taxonomy_dir = os.path.join(self.tempdir, "taxonomy")
+        preprocessed_dir = os.path.join(self.tempdir, "preprocessed")
+        generated_dir = os.path.join(self.tempdir, "generated")
+        postprocessed_dir = os.path.join(self.tempdir, "postprocessed")
+        # HACK handle if this isn't set? or make 1st-class param?
+        sdg_pipeline = pipeline.metadata["pipeline"]
+        # HACK handle if this isn't set? or make 1st-class param?
+        teacher_model_path = pipeline.metadata["teacher_model_path"]
+        # HACK handle if this isn't set? or make 1st-class param?
+        model_id = pipeline.metadata["model_id"]
 
-        # preprocess_taxonomy(
-        #     taxonomy_dir=taxonomy_dir,
-        #     output_dir=preprocessed_dir,
-        #     teacher_model_path=teacher_model_path,
-        # )
+        # reconstruct our taxonomy on disk
+        # HACK because this feels really hacky, and we need a better dataset
+        # representation of a taxonomy
+        for row in input_rows:
+            qna_path = os.path.join(taxonomy_dir, row["qna_path"])
+            qna_contents = row["qna_contents"]
+            os.makedirs(os.path.dirname(qna_path), exist_ok=True)
+            with open(qna_path, "w", encoding="utf-8") as qna_file:
+                qna_file.write(qna_contents)
 
-        # generate_taxonomy(
-        #     client=client,
-        #     input_dir=preprocessed_dir,
-        #     output_dir=generated_dir,
-        #     pipeline=pipeline,
-        #     model_id=model,
-        #     num_cpus=4,
-        #     batch_size=8,
-        # )
+        # Now turn taxonomy into samples
+        preprocess_taxonomy(
+            taxonomy_dir=taxonomy_dir,
+            output_dir=preprocessed_dir,
+            teacher_model_path=teacher_model_path,
+        )
+        preprocessed_files = glob.glob(
+            os.path.join(preprocessed_dir, "**", "*"),
+            recursive=True,
+        )
+        print(f"""!!! preprocessed_files\n{"\n".join(preprocessed_files)}""")
 
-        # postprocess_taxonomy(
-        #     input_dir=generated_dir,
-        #     output_dir=postprocessed_dir,
-        #     date_suffix=date_suffix,
-        #     pipeline=pipeline,
-        # )
+        # HACK hardcoded num_cpus, batch_size
+        generate_taxonomy(
+            client=client,
+            input_dir=preprocessed_dir,
+            output_dir=generated_dir,
+            pipeline=sdg_pipeline,
+            model_id=model_id,
+            num_cpus=4,
+            batch_size=8,
+        )
+        generated_files = glob.glob(
+            os.path.join(generated_dir, "**", "*"),
+            recursive=True,
+        )
+        print(f"""!!! generated_files\n{"\n".join(generated_files)}""")
 
-        # mixed_skills_output_file = f"{postprocessed_dir}/skills_train_msgs_{date_suffix}.jsonl"
-        # mix_datasets(
-        #     recipe_file=f"{postprocessed_dir}/skills_recipe_{date_suffix}.yaml",
-        #     output_file=mixed_skills_output_file,
-        # )
+        postprocess_taxonomy(
+            input_dir=generated_dir,
+            output_dir=postprocessed_dir,
+            date_suffix=date_suffix,
+            pipeline=sdg_pipeline,
+        )
+        postprocessed_files = glob.glob(
+            os.path.join(postprocessed_dir, "**", "*"),
+            recursive=True,
+        )
+        print(f"""!!! postprocessed_files\n{"\n".join(postprocessed_files)}""")
 
-        # mixed_knowledge_output_file = f"{postprocessed_dir}/knowledge_train_msgs_{date_suffix}.jsonl"
-        # mix_datasets(
-        #     recipe_file=f"{postprocessed_dir}/knowledge_recipe_{date_suffix}.yaml",
-        #     output_file=mixed_knowledge_output_file,
-        # )
+        mixed_skills_output_file = f"{postprocessed_dir}/skills_train_msgs_{date_suffix}.jsonl"
+        mix_datasets(
+            recipe_file=f"{postprocessed_dir}/skills_recipe_{date_suffix}.yaml",
+            output_file=mixed_skills_output_file,
+        )
 
-        # output_files = [
-        #     {
-        #         "type": "mixed_skills",
-        #         "path": mixed_skills_output_file,
-        #     },
-        #     {
-        #         "type": "mixed_knowledge",
-        #         "path": mixed_knowledge_output_file,
-        #     }
-        # ]
-        # return output_files
+        mixed_knowledge_output_file = f"{postprocessed_dir}/knowledge_train_msgs_{date_suffix}.jsonl"
+        mix_datasets(
+            recipe_file=f"{postprocessed_dir}/knowledge_recipe_{date_suffix}.yaml",
+            output_file=mixed_knowledge_output_file,
+        )
+
+        # HACK need a better way to output multiple datasets here
+        # or a single dataset with all the needed data in it and some splits?
+        output_files = [
+            {
+                "type": "mixed_skills",
+                "path": mixed_skills_output_file,
+            },
+            {
+                "type": "mixed_knowledge",
+                "path": mixed_knowledge_output_file,
+            }
+        ]
+        return output_files
