@@ -4,9 +4,8 @@
 # This source code is licensed under the terms described in the LICENSE file in
 # the root directory of this source tree.
 
-from typing import Any, Dict, List, Optional
-
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 import asyncio
 import glob
 import os
@@ -36,7 +35,6 @@ from instructlab.sdg.generate_data import (
     preprocess_taxonomy,
 )
 from instructlab.sdg.pipeline import Pipeline as IlabPipeline, PipelineContext as IlabPipelineContext
-
 
 PIPELINES_PREFIX = "instructlab_sdg_pipelines:"
 
@@ -82,22 +80,22 @@ class InstructLabSDGImpl(Pipelines, PipelinesProtocolPrivate):
             value=pipeline.json(),
         )
         self.pipeline_infos[pipeline.identifier] = pipeline
-        print(f"!!! REGISTERED PIPELINE {pipeline}")
+        # print(f"!!! REGISTERED PIPELINE {pipeline}")
 
     async def unregister_pipeline(self, pipeline_id: str) -> None:
         key = f"{PIPELINES_PREFIX}{pipeline_id}"
         await self.kvstore.delete(key=key)
         del self.pipeline_infos[pipeline_id]
-        print(f"!!! UNREGISTERED PIPELINE {pipeline_id}")
+        # print(f"!!! UNREGISTERED PIPELINE {pipeline_id}")
 
     async def synthetic_data_generate(
         self,
         dataset_id: str,
         pipeline_id: str,
     ) -> SyntheticDataGenerationResponse:
-        print(f"!!! Running generate on dataset {dataset_id} with pipeline {pipeline_id}")
+        # print(f"!!! Running generate on dataset {dataset_id} with pipeline {pipeline_id}")
         pipeline = self.pipeline_infos[pipeline_id]
-        print(f"!!! Found pipeline {pipeline}")
+        # print(f"!!! Found pipeline {pipeline}")
         generated_data = await self._run_model_generation(dataset_id, pipeline)
 
         return SyntheticDataGenerationResponse(synthetic_data=generated_data, statistics={})
@@ -107,19 +105,24 @@ class InstructLabSDGImpl(Pipelines, PipelinesProtocolPrivate):
         dataset_id: str,
         pipeline: Pipeline,
     ) -> List[Dict[str, Any]]:
-        print(f"!!! dataset_id {dataset_id}")
-        print(f"!!! pipeline_id {pipeline.pipeline_id}")
+        # print(f"!!! dataset_id {dataset_id}")
+        # print(f"!!! pipeline_id {pipeline.pipeline_id}")
 
         all_rows = await self.datasetio_api.get_rows_paginated(
             dataset_id=dataset_id,
             rows_in_page=-1,
         )
-        print(f"!!! input dataset has {len(all_rows.rows)} rows")
+        # HACK: use a logger, but figure out how to set log levels as well
+        print(f"Running InstructLab synthetic data generation on input dataset {dataset_id} with {len(all_rows.rows)} rows and pipeline {pipeline.identifier}.")
 
-        # HACK: hardcoded client for now
-        client = OpenAI(base_url="http://localhost:8000/v1", api_key="EMPTY")
+        # HACK: we won't have these env variables set when running as a real server
+        base_url = os.getenv("OPENAI_ENDPOINT")
+        assert base_url, "Set the environment variable OPENAI_ENDPOINT to your OpenAI Server endpoint"
+        api_key = os.getenv("OPENAI_API_KEY")
+        assert api_key, "Set the environment variable OPENAI_API_KEY to your OpenAI API key"
+        client = OpenAI(base_url=base_url, api_key=api_key)
         client.server_supports_batched = True
-        if all_rows.rows and all_rows.rows[0]["qna_path"]:
+        if all_rows.rows and all_rows.rows[0].get("qna_path"):
             # Entire e2e data generation
             return await asyncio.to_thread(
                 self._ilab_data_generate,
@@ -150,7 +153,7 @@ class InstructLabSDGImpl(Pipelines, PipelinesProtocolPrivate):
         pipeline_context = IlabPipelineContext(
             client=client,
             model_family=pipeline.metadata.get("model_family", "mixtral"),
-            model_id=pipeline.metadata["model_id"],
+            model_id=pipeline.metadata.get("model_id"),
             num_instructions_to_generate=30,
         )
         temp_file_path = os.path.join(self.tempdir, f"{pipeline.pipeline_id}.yaml")
@@ -208,7 +211,7 @@ class InstructLabSDGImpl(Pipelines, PipelinesProtocolPrivate):
             os.path.join(preprocessed_dir, "**", "*"),
             recursive=True,
         )
-        print(f"""!!! preprocessed_files\n{"\n".join(preprocessed_files)}""")
+        # print(f"""!!! preprocessed_files\n{"\n".join(preprocessed_files)}""")
 
         # HACK hardcoded num_cpus, batch_size
         generate_taxonomy(
@@ -224,7 +227,7 @@ class InstructLabSDGImpl(Pipelines, PipelinesProtocolPrivate):
             os.path.join(generated_dir, "**", "*"),
             recursive=True,
         )
-        print(f"""!!! generated_files\n{"\n".join(generated_files)}""")
+        # print(f"""!!! generated_files\n{"\n".join(generated_files)}""")
 
         postprocess_taxonomy(
             input_dir=generated_dir,
@@ -236,7 +239,7 @@ class InstructLabSDGImpl(Pipelines, PipelinesProtocolPrivate):
             os.path.join(postprocessed_dir, "**", "*"),
             recursive=True,
         )
-        print(f"""!!! postprocessed_files\n{"\n".join(postprocessed_files)}""")
+        # print(f"""!!! postprocessed_files\n{"\n".join(postprocessed_files)}""")
 
         mixed_skills_output_file = f"{postprocessed_dir}/skills_train_msgs_{date_suffix}.jsonl"
         mix_datasets(
