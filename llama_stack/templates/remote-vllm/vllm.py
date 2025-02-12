@@ -43,9 +43,7 @@ def get_distribution_template() -> DistributionTemplate:
     inference_provider = Provider(
         provider_id="vllm-inference",
         provider_type="remote::vllm",
-        config=VLLMInferenceAdapterConfig.sample_run_config(
-            url="${env.VLLM_URL}",
-        ),
+        config={},
     )
     embedding_provider = Provider(
         provider_id="sentence-transformers",
@@ -95,14 +93,14 @@ def get_distribution_template() -> DistributionTemplate:
         description="Use (an external) vLLM server for running LLM inference",
         template_path=Path(__file__).parent / "doc_template.md",
         providers=providers,
-        default_models=[inference_model, safety_model],
+        default_models=[safety_model],
         run_configs={
             "run.yaml": RunConfigSettings(
                 provider_overrides={
                     "inference": [inference_provider, embedding_provider],
                     "vector_io": [vector_io_provider],
                 },
-                default_models=[inference_model, embedding_model],
+                default_models=[embedding_model],
                 default_tool_groups=default_tool_groups,
             ),
             "run-with-safety.yaml": RunConfigSettings(
@@ -121,7 +119,6 @@ def get_distribution_template() -> DistributionTemplate:
                     "vector_io": [vector_io_provider],
                 },
                 default_models=[
-                    inference_model,
                     safety_model,
                     embedding_model,
                 ],

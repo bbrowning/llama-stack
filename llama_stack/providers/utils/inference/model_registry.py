@@ -58,7 +58,7 @@ class ModelRegistryHelper(ModelsProtocolPrivate):
             self.provider_id_to_llama_model_map[alias_obj.provider_model_id] = alias_obj.llama_model
 
     def get_provider_model_id(self, identifier: str) -> Optional[str]:
-        return self.alias_to_provider_id_map.get(identifier, None)
+        return self.alias_to_provider_id_map.get(identifier, identifier)
 
     def get_llama_model(self, provider_model_id: str) -> Optional[str]:
         return self.provider_id_to_llama_model_map.get(provider_model_id, None)
