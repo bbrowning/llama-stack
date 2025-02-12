@@ -25,6 +25,7 @@ python -m venv venv
 source venv/bin/activate
 pip install -e .
 pip install -e ../llama-stack-client-python
+llama stack build --template ollama --image-type venv
 ```
 
 ## Run ollama

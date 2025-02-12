@@ -42,7 +42,7 @@ def available_providers() -> List[ProviderSpec]:
                 adapter_type="instructlab-taxonomy",
                 pip_packages=[
                     "datasets",
-                    "git",
+                    "gitpython",
                 ],
                 module="llama_stack.providers.remote.datasetio.instructlab_taxonomy",
                 config_class="llama_stack.providers.remote.datasetio.instructlab_taxonomy.TaxonomyDatasetIOConfig",
