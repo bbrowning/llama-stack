@@ -6,6 +6,10 @@ from llama_stack.apis.common.content_types import URL
 model_id = os.getenv("OPENAI_MODEL_ID")
 assert model_id, "Set the environment variable OPENAI_MODEL_ID to your OpenAI model's id"
 
+teacher_model_path = os.getenv("TEACHER_MODEL_PATH")
+assert teacher_model_path, "Set the environment variable TEACHER_MODEL_PATH to your teacher model's location on disk"
+teacher_model_path = os.path.expanduser(teacher_model_path)
+
 client = LlamaStackAsLibraryClient("ollama")
 client.initialize()
 
@@ -36,7 +40,7 @@ client.pipelines.register(
     metadata={
         # provider-specific metadata about this pipeline
         "pipeline": "full",  # for a built-in e2e pipeline
-        "teacher_model_path": "/home/bbrownin/src/instructlab/sdg/tests/testdata/models/instructlab/granite-7b-lab",
+        "teacher_model_path": teacher_model_path,
         "model_id": model_id,
     },
 )

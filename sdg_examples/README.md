@@ -63,6 +63,19 @@ python sdg_examples/custom_pipeline.py
 This takes MUCH longer, as we do real data generation and hit a real
 teacher model endpoint, specified by your OPENAI_* env variables above.
 
+Also, we need a teacher model on disk to be able to load its
+tokenizer. There are various ways to do this, such as using `ilab
+model download` from InstructLab or the HuggingFace CLI.
+
+I tend to just use the tokenizer from InstructLab's quantized
+merlinite instead of downloading the entire mixtral teacher
+model. Either way, export an environment variable with the path to
+your teacher model:
+
+```
+export TEACHER_MODEL_PATH="~/.cache/instructlab/models/mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+```
+
 ```
 python sdg_examples/full_pipeline.py
 ```
