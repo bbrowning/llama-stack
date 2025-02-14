@@ -53,11 +53,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt pytest pytest-html pytest-asyncio
-          pip install -e .
+          pip install uv
+          uv sync --extra dev
+          uv pip install -e .
 
       - name: Build providers
         run: |
+          source .venv/bin/activate
           llama stack build --template remote-vllm --image-type venv
 
       - name: Build vLLM Container
@@ -78,8 +80,10 @@ jobs:
 
       - name: Run provider inference tests
         run: |
-          VLLM_URL="http://localhost:8000/v1" INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" python -m pytest -s -v llama_stack/providers/tests/inference/test_text_inference.py --providers "inference=vllm_remote"
+          source .venv/bin/activate
+          VLLM_URL="http://localhost:8000/v1" INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" pytest -s -v llama_stack/providers/tests/inference/test_text_inference.py --providers "inference=vllm_remote"
 
       - name: Run client sdk tests
         run: |
-          VLLM_URL="http://localhost:8000/v1" INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" LLAMA_STACK_CONFIG=remote-vllm python -m pytest -v tests/client-sdk/inference/test_text_inference.py --inference-model "meta-llama/Llama-3.2-3B-Instruct"
+          source .venv/bin/activate
+          VLLM_URL="http://localhost:8000/v1" INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" LLAMA_STACK_CONFIG=remote-vllm pytest -v tests/client-sdk/inference/test_text_inference.py --inference-model "meta-llama/Llama-3.2-3B-Instruct"
