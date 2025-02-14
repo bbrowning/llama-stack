@@ -49,7 +49,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: vllm
-          file: Dockerfile.cpu
+          file: vllm/Dockerfile.cpu
           load: true
           shm-size: 4g
           tags: vllm-cpu-env:latest
