@@ -56,7 +56,7 @@ jobs:
 
       - name: Run vLLM Container
         run: |
-          docker run --rm --network=host --env=HF_TOKEN vllm-cpu-env:latest --model meta-llama/Llama-3.2-3B-Instruct --port 8000 --enable-auto-tool-choice --tool-call-parser llama3_json &
+          docker run --rm --network=host --env=HF_TOKEN vllm-cpu-env:latest --model meta-llama/Llama-3.2-3B-Instruct --port 8000 --enable-auto-tool-choice --tool-call-parser llama3_json --max-model-len 16000 &
           curl --head -X GET --retry 60 --retry-connrefused --retry-delay 5 http://localhost:8000/v1/models
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
