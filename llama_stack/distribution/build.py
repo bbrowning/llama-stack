@@ -101,6 +101,9 @@ def build_image(
 
     normal_deps, special_deps = get_provider_dependencies(build_config.distribution_spec.providers)
     normal_deps += SERVER_DEPENDENCIES
+    print(f"!!! image_name {image_name}")
+    print(f"!!! normal_deps {normal_deps}")
+    print(f"!!! special_deps {special_deps}")
 
     if build_config.image_type == ImageType.container.value:
         script = str(importlib.resources.files("llama_stack") / "distribution/build_container.sh")

@@ -57,11 +57,15 @@ jobs:
           uv sync --extra dev
           uv pip install pytest-html pytest-asyncio
           uv pip install -e .
+          source .venv/bin/activate
+          pip list installed
 
       - name: Build providers
         run: |
           source .venv/bin/activate
+          llama stack build --template remote-vllm --print-deps-only
           llama stack build --template remote-vllm --image-type venv
+          uv pip list
 
       - name: Build vLLM Container
         uses: docker/build-push-action@v6
