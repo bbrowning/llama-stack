@@ -77,10 +77,15 @@ jobs:
           load: true
           shm-size: 4g
           tags: vllm-cpu-env:latest
+        env:
+          DOCKER_BUILD_CHECKS_ANNOTATIONS: false
+          DOCKER_BUILD_SUMMARY: false
+          DOCKER_BUILD_RECORD_UPLOAD: false
 
       - name: Run vLLM Container
         run: |
-          docker run --rm --network=host --env=HF_TOKEN --detach vllm-cpu-env:latest --model meta-llama/Llama-3.2-3B-Instruct --port 8000 --enable-auto-tool-choice --tool-call-parser llama3_json --max-model-len 16000 > container_id
+          docker run --rm --network=host --env=HF_TOKEN --detach vllm-cpu-env:latest --model meta-llama/Llama-3.2-3B-Instruct --port 8000 --guided-decoding-backend outlines --enable-auto-tool-choice --tool-call-parser llama3_json --max-model-len 16000 > container_id
+          docker logs --follow $(cat container_id) &
           curl --head -X GET --retry 60 --retry-connrefused --retry-delay 15 http://localhost:8000/v1/models
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -88,11 +93,11 @@ jobs:
       - name: Run provider inference tests
         run: |
           source llamastack-remote-vllm/bin/activate
-          docker logs --follow $(cat container_id) &
+          docker logs --follow --tail 1 $(cat container_id) &
           VLLM_URL="http://localhost:8000/v1" INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" python -m pytest -s -v llama_stack/providers/tests/inference/test_text_inference.py --providers "inference=vllm_remote"
 
       - name: Run client sdk tests
         run: |
           source llamastack-remote-vllm/bin/activate
-          docker logs --follow $(cat container_id) &
+          docker logs --follow --tail 1 $(cat container_id) &
           VLLM_URL="http://localhost:8000/v1" INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" LLAMA_STACK_CONFIG="remote-vllm" python -m pytest -s -v tests/client-sdk/inference/test_text_inference.py --inference-model "meta-llama/Llama-3.2-3B-Instruct"
