@@ -27,6 +27,7 @@ from llama_stack.apis.providers import Providers
 from llama_stack.apis.safety import Safety
 from llama_stack.apis.scoring import Scoring
 from llama_stack.apis.scoring_functions import ScoringFunctions
+from llama_stack.apis.sdg_functions import SDGFunctions
 from llama_stack.apis.shields import Shields
 from llama_stack.apis.synthetic_data_generation import SyntheticDataGeneration
 from llama_stack.apis.telemetry import Telemetry
@@ -51,7 +52,6 @@ class LlamaStack(
     BatchInference,
     Agents,
     Safety,
-    SyntheticDataGeneration,
     Datasets,
     Telemetry,
     PostTraining,
@@ -60,6 +60,8 @@ class LlamaStack(
     Benchmarks,
     Scoring,
     ScoringFunctions,
+    SDGFunctions,
+    SyntheticDataGeneration,
     DatasetIO,
     Models,
     Shields,
@@ -82,6 +84,12 @@ RESOURCES = [
         Api.scoring_functions,
         "register_scoring_function",
         "list_scoring_functions",
+    ),
+    (
+        "sdg_fns",
+        Api.sdg_functions,
+        "register_sdg_function",
+        "list_sdg_functions",
     ),
     ("benchmarks", Api.benchmarks, "register_benchmark", "list_benchmarks"),
     ("tool_groups", Api.tool_groups, "register_tool_group", "list_tool_groups"),

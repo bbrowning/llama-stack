@@ -22,6 +22,8 @@ distribution_spec:
     - inline::basic
     - inline::llm-as-judge
     - inline::braintrust
+    synthetic_data_generation:
+    - inline::instructlab-sdg
     telemetry:
     - inline::meta-reference
     tool_runtime:

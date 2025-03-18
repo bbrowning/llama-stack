@@ -18,7 +18,9 @@ from llama_stack.apis.resource import Resource
 from llama_stack.apis.safety import Safety
 from llama_stack.apis.scoring import Scoring
 from llama_stack.apis.scoring_functions import ScoringFn, ScoringFnInput
+from llama_stack.apis.sdg_functions import SDGFn, SDGFnInput
 from llama_stack.apis.shields import Shield, ShieldInput
+from llama_stack.apis.synthetic_data_generation import SyntheticDataGeneration
 from llama_stack.apis.tools import Tool, ToolGroup, ToolGroupInput, ToolRuntime
 from llama_stack.apis.vector_dbs import VectorDB, VectorDBInput
 from llama_stack.apis.vector_io import VectorIO
@@ -147,6 +149,7 @@ RoutableObject = Union[
     VectorDB,
     Dataset,
     ScoringFn,
+    SDGFn,
     Benchmark,
     Tool,
     ToolGroup,
@@ -160,6 +163,7 @@ RoutableObjectWithProvider = Annotated[
         VectorDBWithACL,
         DatasetWithACL,
         ScoringFnWithACL,
+        SDGFn,
         BenchmarkWithACL,
         ToolWithACL,
         ToolGroupWithACL,
@@ -174,6 +178,7 @@ RoutedProtocol = Union[
     DatasetIO,
     Scoring,
     Eval,
+    SyntheticDataGeneration,
     ToolRuntime,
 ]
 
@@ -302,6 +307,7 @@ a default SQLite store will be used.""",
     vector_dbs: List[VectorDBInput] = Field(default_factory=list)
     datasets: List[DatasetInput] = Field(default_factory=list)
     scoring_fns: List[ScoringFnInput] = Field(default_factory=list)
+    sdg_fns: List[SDGFnInput] = Field(default_factory=list)
     benchmarks: List[BenchmarkInput] = Field(default_factory=list)
     tool_groups: List[ToolGroupInput] = Field(default_factory=list)
 

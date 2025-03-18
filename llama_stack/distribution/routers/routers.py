@@ -43,6 +43,10 @@ from llama_stack.apis.scoring import (
     ScoringFnParams,
 )
 from llama_stack.apis.shields import Shield
+from llama_stack.apis.synthetic_data_generation import (
+    SyntheticDataGeneration,
+    SyntheticDataGenerationResponse,
+)
 from llama_stack.apis.telemetry import MetricEvent, MetricInResponse, Telemetry
 from llama_stack.apis.tools import (
     RAGDocument,
@@ -569,6 +573,30 @@ class ScoringRouter(Scoring):
             res.update(score_response.results)
 
         return ScoreResponse(results=res)
+
+
+class SyntheticDataGenerationRouter(SyntheticDataGeneration):
+    def __init__(
+        self,
+        routing_table: RoutingTable,
+    ) -> None:
+        self.routing_table = routing_table
+
+    async def initialize(self) -> None:
+        pass
+
+    async def shutdown(self) -> None:
+        pass
+
+    async def synthetic_data_generate(
+        self,
+        dataset_id: str,
+        sdg_fn_id: str,
+    ) -> SyntheticDataGenerationResponse:
+        return await self.routing_table.get_provider_impl(sdg_fn_id).synthetic_data_generate(
+            dataset_id=dataset_id,
+            sdg_fn_id=sdg_fn_id,
+        )
 
 
 class EvalRouter(Eval):

@@ -131,6 +131,7 @@ shields: []
 vector_dbs: []
 datasets: []
 scoring_fns: []
+sdg_fns: []
 benchmarks: []
 tool_groups:
 - toolgroup_id: builtin::websearch

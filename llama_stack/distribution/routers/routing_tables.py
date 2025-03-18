@@ -31,6 +31,11 @@ from llama_stack.apis.scoring_functions import (
     ScoringFnParams,
     ScoringFunctions,
 )
+from llama_stack.apis.sdg_functions import (
+    ListSDGFunctionsResponse,
+    SDGFn,
+    SDGFunctions,
+)
 from llama_stack.apis.shields import ListShieldsResponse, Shield, Shields
 from llama_stack.apis.tools import (
     ListToolGroupsResponse,
@@ -83,6 +88,8 @@ async def register_object_with_provider(obj: RoutableObject, p: Any) -> Routable
         return await p.register_dataset(obj)
     elif api == Api.scoring:
         return await p.register_scoring_function(obj)
+    elif api == Api.synthetic_data_generation:
+        return await p.register_sdg_function(obj)
     elif api == Api.eval:
         return await p.register_benchmark(obj)
     elif api == Api.tool_runtime:
@@ -99,6 +106,8 @@ async def unregister_object_from_provider(obj: RoutableObject, p: Any) -> None:
         return await p.unregister_model(obj.identifier)
     elif api == Api.datasetio:
         return await p.unregister_dataset(obj.identifier)
+    elif api == Api.synthetic_data_generation:
+        return await p.unregister_sdg_function(obj.identifier)
     elif api == Api.tool_runtime:
         return await p.unregister_tool(obj.identifier)
     else:
@@ -144,6 +153,10 @@ class CommonRoutingTableImpl(RoutingTable):
                 p.scoring_function_store = self
                 scoring_functions = await p.list_scoring_functions()
                 await add_objects(scoring_functions, pid, ScoringFn)
+            elif api == Api.synthetic_data_generation:
+                p.sdg_function_store = self
+                sdg_functions = await p.list_sdg_functions()
+                await add_objects(sdg_functions, pid, SDGFn)
             elif api == Api.eval:
                 p.benchmark_store = self
             elif api == Api.tool_runtime:
@@ -165,6 +178,8 @@ class CommonRoutingTableImpl(RoutingTable):
                 return ("DatasetIO", "dataset")
             elif isinstance(self, ScoringFunctionsRoutingTable):
                 return ("Scoring", "scoring_function")
+            elif isinstance(self, SDGFunctionsRoutingTable):
+                return ("SyntheticDataGeneration", "sdg_function")
             elif isinstance(self, BenchmarksRoutingTable):
                 return ("Eval", "benchmark")
             elif isinstance(self, ToolGroupsRoutingTable):
@@ -495,6 +510,45 @@ class ScoringFunctionsRoutingTable(CommonRoutingTableImpl, ScoringFunctions):
         )
         scoring_fn.provider_id = provider_id
         await self.register_object(scoring_fn)
+
+
+class SDGFunctionsRoutingTable(CommonRoutingTableImpl, SDGFunctions):
+    async def list_sdg_functions(self) -> ListSDGFunctionsResponse:
+        return ListSDGFunctionsResponse(data=await self.get_all_with_type(ResourceType.sdg_function.value))
+
+    async def get_sdg_function(self, sdg_fn_id: str) -> Optional[SDGFn]:
+        return await self.get_object_by_identifier("sdg_function", sdg_fn_id)
+
+    async def register_sdg_function(
+        self,
+        sdg_fn_id: str,
+        description: str,
+        provider_sdg_fn_id: Optional[str] = None,
+        provider_id: Optional[str] = None,
+    ) -> None:
+        if provider_sdg_fn_id is None:
+            provider_sdg_fn_id = sdg_fn_id
+        if provider_id is None:
+            if len(self.impls_by_provider_id) == 1:
+                provider_id = list(self.impls_by_provider_id.keys())[0]
+            else:
+                raise ValueError(
+                    "No provider specified and multiple providers available. Please specify a provider_id."
+                )
+        sdg_fn = SDGFn(
+            identifier=sdg_fn_id,
+            description=description,
+            provider_resource_id=provider_sdg_fn_id,
+            provider_id=provider_id,
+        )
+        sdg_fn.provider_id = provider_id
+        await self.register_object(sdg_fn)
+
+    async def unregister_sdg_function(self, sdg_fn_id: str) -> None:
+        sdg_fn = await self.get_sdg_function(sdg_fn_id)
+        if sdg_fn is None:
+            raise ValueError(f"SDGFunction {sdg_fn_id} not found")
+        await self.unregister_object(sdg_fn)
 
 
 class BenchmarksRoutingTable(CommonRoutingTableImpl, Benchmarks):

@@ -4,33 +4,19 @@
 # This source code is licensed under the terms described in the LICENSE file in
 # the root directory of this source tree.
 
-from enum import Enum
 from typing import Any, Dict, List, Optional, Protocol, Union
 
 from pydantic import BaseModel
 
-from llama_stack.apis.inference import Message
 from llama_stack.schema_utils import json_schema_type, webmethod
-
-
-class FilteringFunction(Enum):
-    """The type of filtering function."""
-
-    none = "none"
-    random = "random"
-    top_k = "top_k"
-    top_p = "top_p"
-    top_k_top_p = "top_k_top_p"
-    sigmoid = "sigmoid"
 
 
 @json_schema_type
 class SyntheticDataGenerationRequest(BaseModel):
-    """Request to generate synthetic data. A small batch of prompts and a filtering function"""
+    """Request to generate synthetic data."""
 
-    dialogs: List[Message]
-    filtering_function: FilteringFunction = FilteringFunction.none
-    model: Optional[str] = None
+    dataset_id: str
+    sdg_fn_id: str
 
 
 @json_schema_type
@@ -45,7 +31,6 @@ class SyntheticDataGeneration(Protocol):
     @webmethod(route="/synthetic-data-generation/generate")
     def synthetic_data_generate(
         self,
-        dialogs: List[Message],
-        filtering_function: FilteringFunction = FilteringFunction.none,
-        model: Optional[str] = None,
+        dataset_id: str,
+        sdg_fn_id: str,
     ) -> Union[SyntheticDataGenerationResponse]: ...

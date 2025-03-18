@@ -20,7 +20,9 @@ from llama_stack.apis.providers import Providers as ProvidersAPI
 from llama_stack.apis.safety import Safety
 from llama_stack.apis.scoring import Scoring
 from llama_stack.apis.scoring_functions import ScoringFunctions
+from llama_stack.apis.sdg_functions import SDGFunctions
 from llama_stack.apis.shields import Shields
+from llama_stack.apis.synthetic_data_generation import SyntheticDataGeneration
 from llama_stack.apis.telemetry import Telemetry
 from llama_stack.apis.tools import ToolGroups, ToolRuntime
 from llama_stack.apis.vector_dbs import VectorDBs
@@ -46,6 +48,7 @@ from llama_stack.providers.datatypes import (
     RemoteProviderConfig,
     RemoteProviderSpec,
     ScoringFunctionsProtocolPrivate,
+    SDGFunctionsProtocolPrivate,
     ShieldsProtocolPrivate,
     ToolsProtocolPrivate,
     VectorDBsProtocolPrivate,
@@ -74,6 +77,8 @@ def api_protocol_map() -> Dict[Api, Any]:
         Api.datasets: Datasets,
         Api.scoring: Scoring,
         Api.scoring_functions: ScoringFunctions,
+        Api.sdg_functions: SDGFunctions,
+        Api.synthetic_data_generation: SyntheticDataGeneration,
         Api.eval: Eval,
         Api.benchmarks: Benchmarks,
         Api.post_training: PostTraining,
@@ -93,6 +98,11 @@ def additional_protocols_map() -> Dict[Api, Any]:
             ScoringFunctionsProtocolPrivate,
             ScoringFunctions,
             Api.scoring_functions,
+        ),
+        Api.synthetic_data_generation: (
+            SDGFunctionsProtocolPrivate,
+            SDGFunctions,
+            Api.sdg_functions,
         ),
         Api.eval: (BenchmarksProtocolPrivate, Benchmarks, Api.benchmarks),
     }

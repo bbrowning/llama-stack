@@ -591,6 +591,7 @@
     "fastapi",
     "fire",
     "httpx",
+    "instructlab-sdg",
     "langdetect",
     "matplotlib",
     "mcp",

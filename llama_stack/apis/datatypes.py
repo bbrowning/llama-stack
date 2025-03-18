@@ -23,6 +23,7 @@ class Api(Enum):
     scoring = "scoring"
     eval = "eval"
     post_training = "post_training"
+    synthetic_data_generation = "synthetic_data_generation"
     tool_runtime = "tool_runtime"
 
     telemetry = "telemetry"
@@ -32,6 +33,7 @@ class Api(Enum):
     vector_dbs = "vector_dbs"
     datasets = "datasets"
     scoring_functions = "scoring_functions"
+    sdg_functions = "sdg_functions"
     benchmarks = "benchmarks"
     tool_groups = "tool_groups"
 

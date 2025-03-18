@@ -200,6 +200,7 @@ datasets:
   metadata: {}
   dataset_id: docvqa
 scoring_fns: []
+sdg_fns: []
 benchmarks:
 - dataset_id: simpleqa
   scoring_functions:

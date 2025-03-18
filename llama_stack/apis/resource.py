@@ -15,6 +15,7 @@ class ResourceType(Enum):
     vector_db = "vector_db"
     dataset = "dataset"
     scoring_function = "scoring_function"
+    sdg_function = "sdg_function"
     benchmark = "benchmark"
     tool = "tool"
     tool_group = "tool_group"

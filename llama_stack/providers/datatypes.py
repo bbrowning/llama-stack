@@ -14,6 +14,7 @@ from llama_stack.apis.datasets import Dataset
 from llama_stack.apis.datatypes import Api
 from llama_stack.apis.models import Model
 from llama_stack.apis.scoring_functions import ScoringFn
+from llama_stack.apis.sdg_functions import SDGFn
 from llama_stack.apis.shields import Shield
 from llama_stack.apis.tools import Tool
 from llama_stack.apis.vector_dbs import VectorDB
@@ -46,6 +47,14 @@ class ScoringFunctionsProtocolPrivate(Protocol):
     async def list_scoring_functions(self) -> List[ScoringFn]: ...
 
     async def register_scoring_function(self, scoring_fn: ScoringFn) -> None: ...
+
+
+class SDGFunctionsProtocolPrivate(Protocol):
+    async def list_sdg_functions(self) -> List[SDGFn]: ...
+
+    async def register_sdg_function(self, sdg_fn: SDGFn) -> None: ...
+
+    async def unregister_sdg_function(self, sdg_fn_id: str) -> None: ...
 
 
 class BenchmarksProtocolPrivate(Protocol):

@@ -907,6 +907,59 @@ paths:
           required: true
           schema:
             type: string
+  /v1/sdg_functions/{sdg_fn_id}:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SDGFn'
+                  - type: 'null'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '429':
+          $ref: >-
+            #/components/responses/TooManyRequests429
+        '500':
+          $ref: >-
+            #/components/responses/InternalServerError500
+        default:
+          $ref: '#/components/responses/DefaultError'
+      tags:
+        - SDGFunctions
+      description: ''
+      parameters:
+        - name: sdg_fn_id
+          in: path
+          required: true
+          schema:
+            type: string
+    delete:
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '429':
+          $ref: >-
+            #/components/responses/TooManyRequests429
+        '500':
+          $ref: >-
+            #/components/responses/InternalServerError500
+        default:
+          $ref: '#/components/responses/DefaultError'
+      tags:
+        - SDGFunctions
+      description: ''
+      parameters:
+        - name: sdg_fn_id
+          in: path
+          required: true
+          schema:
+            type: string
   /v1/shields/{identifier}:
     get:
       responses:
@@ -1919,6 +1972,53 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegisterScoringFunctionRequest'
+        required: true
+  /v1/sdg_functions:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSDGFunctionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '429':
+          $ref: >-
+            #/components/responses/TooManyRequests429
+        '500':
+          $ref: >-
+            #/components/responses/InternalServerError500
+        default:
+          $ref: '#/components/responses/DefaultError'
+      tags:
+        - SDGFunctions
+      description: ''
+      parameters: []
+    post:
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '429':
+          $ref: >-
+            #/components/responses/TooManyRequests429
+        '500':
+          $ref: >-
+            #/components/responses/InternalServerError500
+        default:
+          $ref: '#/components/responses/DefaultError'
+      tags:
+        - SDGFunctions
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterSdgFunctionRequest'
         required: true
   /v1/shields:
     get:
@@ -5022,6 +5122,7 @@ components:
         - metadata
         - return_type
       title: ScoringFn
+<<<<<<< HEAD
     StringType:
       type: object
       properties:
@@ -5044,6 +5145,41 @@ components:
       required:
         - type
       title: UnionType
+=======
+    SDGFn:
+      type: object
+      properties:
+        identifier:
+          type: string
+        provider_resource_id:
+          type: string
+        provider_id:
+          type: string
+        type:
+          type: string
+          const: sdg_function
+          default: sdg_function
+        description:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: 'null'
+              - type: boolean
+              - type: number
+              - type: string
+              - type: array
+              - type: object
+      additionalProperties: false
+      required:
+        - identifier
+        - provider_resource_id
+        - provider_id
+        - type
+        - metadata
+      title: SDGFn
+>>>>>>> afb9aa72 (distro codegen)
     Shield:
       type: object
       properties:
@@ -5733,6 +5869,17 @@ components:
       required:
         - data
       title: ListScoringFunctionsResponse
+    ListSDGFunctionsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SDGFn'
+      additionalProperties: false
+      required:
+        - data
+      title: ListSDGFunctionsResponse
     ListShieldsResponse:
       type: object
       properties:
@@ -6494,6 +6641,22 @@ components:
         - description
         - return_type
       title: RegisterScoringFunctionRequest
+    RegisterSdgFunctionRequest:
+      type: object
+      properties:
+        sdg_fn_id:
+          type: string
+        description:
+          type: string
+        provider_sdg_fn_id:
+          type: string
+        provider_id:
+          type: string
+      additionalProperties: false
+      required:
+        - sdg_fn_id
+        - description
+      title: RegisterSdgFunctionRequest
     RegisterShieldRequest:
       type: object
       properties:
@@ -6817,27 +6980,14 @@ components:
     SyntheticDataGenerateRequest:
       type: object
       properties:
-        dialogs:
-          type: array
-          items:
-            $ref: '#/components/schemas/Message'
-        filtering_function:
+        dataset_id:
           type: string
-          enum:
-            - none
-            - random
-            - top_k
-            - top_p
-            - top_k_top_p
-            - sigmoid
-          title: FilteringFunction
-          description: The type of filtering function.
-        model:
+        sdg_fn_id:
           type: string
       additionalProperties: false
       required:
-        - dialogs
-        - filtering_function
+        - dataset_id
+        - sdg_fn_id
       title: SyntheticDataGenerateRequest
     SyntheticDataGenerationResponse:
       type: object
@@ -6972,6 +7122,7 @@ tags:
   - name: Providers
     x-displayName: >-
       Providers API for inspecting, listing, and modifying providers and their configurations.
+  - name: SDGFunctions
   - name: Safety
   - name: Scoring
   - name: ScoringFunctions
@@ -6997,6 +7148,7 @@ x-tagGroups:
       - Models
       - PostTraining (Coming Soon)
       - Providers
+      - SDGFunctions
       - Safety
       - Scoring
       - ScoringFunctions

@@ -7,6 +7,7 @@ apis:
 - inference
 - safety
 - scoring
+- synthetic_data_generation
 - telemetry
 - tool_runtime
 - vector_io
@@ -84,6 +85,14 @@ providers:
     provider_type: inline::braintrust
     config:
       openai_api_key: ${env.OPENAI_API_KEY:}
+  synthetic_data_generation:
+  - provider_id: instructlab-sdg
+    provider_type: inline::instructlab-sdg
+    config:
+      kvstore:
+        type: sqlite
+        namespace: null
+        db_path: ${env.SQLITE_STORE_DIR:~/.llama/distributions/remote-vllm}/instructlab_sdg.db
   telemetry:
   - provider_id: meta-reference
     provider_type: inline::meta-reference
@@ -136,6 +145,7 @@ shields:
 vector_dbs: []
 datasets: []
 scoring_fns: []
+sdg_fns: []
 benchmarks: []
 tool_groups:
 - toolgroup_id: builtin::websearch
