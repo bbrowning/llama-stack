@@ -590,6 +590,7 @@
     "faiss-cpu",
     "fastapi",
     "fire",
+    "git+https://github.com/bbrowning/llama-stack-openai-client",
     "httpx",
     "instructlab-sdg",
     "langdetect",

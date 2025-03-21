@@ -14,7 +14,8 @@ def available_providers() -> List[ProviderSpec]:
         InlineProviderSpec(
             api=Api.synthetic_data_generation,
             provider_type="inline::instructlab-sdg",
-            pip_packages=["instructlab-sdg"],
+            # TODO: research SDG, real client adapter repo
+            pip_packages=["instructlab-sdg", "git+https://github.com/bbrowning/llama-stack-openai-client"],
             module="llama_stack.providers.inline.synthetic_data_generation.instructlab_sdg",
             config_class="llama_stack.providers.inline.synthetic_data_generation.instructlab_sdg.InstructLabSDGConfig",
             api_dependencies=[

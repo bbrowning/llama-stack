@@ -4,17 +4,15 @@
 # This source code is licensed under the terms described in the LICENSE file in
 # the root directory of this source tree.
 
-from datasets import Dataset as HFDataset
-from typing import Any, Dict, List, Optional
 import asyncio
-import os
 import tempfile
 from typing import List
 
-from datasets import Dataset
+from datasets import Dataset as HFDataset
 from instructlab.sdg.flow import Flow
 from instructlab.sdg.pipeline import Pipeline
 from instructlab.sdg.sdg import SDG
+from lls_openai_client.client_adapter import OpenAIClientAdapter
 
 from llama_stack.apis.datasetio import DatasetIO
 from llama_stack.apis.datasets import Datasets
@@ -28,7 +26,7 @@ from .....apis.synthetic_data_generation.synthetic_data_generation import (
     SyntheticDataGenerationResponse,
 )
 from .config import InstructLabSDGConfig
-from .openai_client_adapter import OpenAIClientAdapter
+from .server_client import ServerLlamaStackClient
 
 SDG_FNS_PREFIX = "instructlab_sdg_functions:"
 
@@ -109,7 +107,8 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
         input_ds = HFDataset.from_list(input_rows)
 
         pipeline_yaml = params.pipeline_yaml
-        client = OpenAIClientAdapter(self.inference_api, self.models_api)
+        server_client = ServerLlamaStackClient(self.inference_api, self.models_api)
+        client = OpenAIClientAdapter(server_client)
         output_ds = await asyncio.to_thread(
             self._run_generate,
             client,
@@ -129,9 +128,9 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
         input_ds: HFDataset,
         pipeline_yaml: str,
     ) -> HFDataset:
-        num_workers=2
-        batch_size=8
-        save_freq=2
+        num_workers = 2
+        batch_size = 8
+        save_freq = 2
         with tempfile.NamedTemporaryFile(delete=False, mode="w", encoding="utf-8") as temp_file:
             temp_file.write(pipeline_yaml)
             temp_file.close()
