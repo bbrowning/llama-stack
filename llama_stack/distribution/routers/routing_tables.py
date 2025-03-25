@@ -516,7 +516,7 @@ class SDGFunctionsRoutingTable(CommonRoutingTableImpl, SDGFunctions):
     async def list_sdg_functions(self) -> ListSDGFunctionsResponse:
         return ListSDGFunctionsResponse(data=await self.get_all_with_type(ResourceType.sdg_function.value))
 
-    async def get_sdg_function(self, sdg_fn_id: str) -> Optional[SDGFn]:
+    async def get_sdg_function(self, sdg_fn_id: str) -> SDGFn:
         return await self.get_object_by_identifier("sdg_function", sdg_fn_id)
 
     async def register_sdg_function(

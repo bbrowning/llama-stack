@@ -80,7 +80,7 @@ class SDGFunctions(Protocol):
     async def get_sdg_function(
         self,
         sdg_fn_id: str,
-    ) -> Optional[SDGFn]: ...
+    ) -> SDGFn: ...
 
     @webmethod(route="/sdg_functions", method="POST")
     async def register_sdg_function(

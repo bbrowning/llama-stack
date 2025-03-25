@@ -915,9 +915,7 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/SDGFn'
-                  - type: 'null'
+                $ref: '#/components/schemas/SDGFn'
         '400':
           $ref: '#/components/responses/BadRequest400'
         '429':
@@ -5122,7 +5120,6 @@ components:
         - metadata
         - return_type
       title: ScoringFn
-<<<<<<< HEAD
     StringType:
       type: object
       properties:
@@ -5145,7 +5142,6 @@ components:
       required:
         - type
       title: UnionType
-=======
     SDGFn:
       type: object
       properties:
@@ -5171,6 +5167,8 @@ components:
               - type: string
               - type: array
               - type: object
+        params:
+          $ref: '#/components/schemas/SDGFnParams'
       additionalProperties: false
       required:
         - identifier
@@ -5179,7 +5177,19 @@ components:
         - type
         - metadata
       title: SDGFn
->>>>>>> afb9aa72 (distro codegen)
+    SDGFnParams:
+      type: object
+      properties:
+        type:
+          type: string
+          const: instructlab_sdg
+          default: instructlab_sdg
+        pipeline_yaml:
+          type: string
+      additionalProperties: false
+      required:
+        - type
+      title: InstructLabSDGFnParams
     Shield:
       type: object
       properties:

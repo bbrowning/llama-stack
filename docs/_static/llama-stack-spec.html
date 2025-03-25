@@ -1335,14 +1335,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "oneOf": [
-                                        {
-                                            "$ref": "#/components/schemas/SDGFn"
-                                        },
-                                        {
-                                            "type": "null"
-                                        }
-                                    ]
+                                    "$ref": "#/components/schemas/SDGFn"
                                 }
                             }
                         }
@@ -7380,7 +7373,6 @@
                 ],
                 "title": "ScoringFn"
             },
-<<<<<<< HEAD
             "StringType": {
                 "type": "object",
                 "properties": {
@@ -7388,7 +7380,29 @@
                         "type": "string",
                         "const": "string",
                         "default": "string"
-=======
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "type"
+                ],
+                "title": "StringType"
+            },
+            "UnionType": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "const": "union",
+                        "default": "union"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "type"
+                ],
+                "title": "UnionType"
+            },
             "SDGFn": {
                 "type": "object",
                 "properties": {
@@ -7433,31 +7447,13 @@
                                 }
                             ]
                         }
->>>>>>> afb9aa72 (distro codegen)
+                    },
+                    "params": {
+                        "$ref": "#/components/schemas/SDGFnParams"
                     }
                 },
                 "additionalProperties": false,
                 "required": [
-<<<<<<< HEAD
-                    "type"
-                ],
-                "title": "StringType"
-            },
-            "UnionType": {
-                "type": "object",
-                "properties": {
-                    "type": {
-                        "type": "string",
-                        "const": "union",
-                        "default": "union"
-                    }
-                },
-                "additionalProperties": false,
-                "required": [
-                    "type"
-                ],
-                "title": "UnionType"
-=======
                     "identifier",
                     "provider_resource_id",
                     "provider_id",
@@ -7465,7 +7461,24 @@
                     "metadata"
                 ],
                 "title": "SDGFn"
->>>>>>> afb9aa72 (distro codegen)
+            },
+            "SDGFnParams": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "const": "instructlab_sdg",
+                        "default": "instructlab_sdg"
+                    },
+                    "pipeline_yaml": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "type"
+                ],
+                "title": "InstructLabSDGFnParams"
             },
             "Shield": {
                 "type": "object",
