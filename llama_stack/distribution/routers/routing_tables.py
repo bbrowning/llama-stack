@@ -56,6 +56,7 @@ from llama_stack.distribution.datatypes import (
     RoutableObjectWithProvider,
     RoutedProtocol,
     ScoringFnWithACL,
+    SDGFnWithACL,
     ShieldWithACL,
     ToolGroupWithACL,
     ToolWithACL,
@@ -535,7 +536,7 @@ class SDGFunctionsRoutingTable(CommonRoutingTableImpl, SDGFunctions):
                 raise ValueError(
                     "No provider specified and multiple providers available. Please specify a provider_id."
                 )
-        sdg_fn = SDGFn(
+        sdg_fn = SDGFnWithACL(
             identifier=sdg_fn_id,
             description=description,
             provider_resource_id=provider_sdg_fn_id,

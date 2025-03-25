@@ -131,6 +131,10 @@ class ScoringFnWithACL(ScoringFn, ResourceWithACL):
     pass
 
 
+class SDGFnWithACL(SDGFn, ResourceWithACL):
+    pass
+
+
 class BenchmarkWithACL(Benchmark, ResourceWithACL):
     pass
 
@@ -163,7 +167,7 @@ RoutableObjectWithProvider = Annotated[
         VectorDBWithACL,
         DatasetWithACL,
         ScoringFnWithACL,
-        SDGFn,
+        SDGFnWithACL,
         BenchmarkWithACL,
         ToolWithACL,
         ToolGroupWithACL,
