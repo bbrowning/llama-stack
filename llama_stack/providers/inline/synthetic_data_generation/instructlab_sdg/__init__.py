@@ -21,6 +21,7 @@ async def get_provider_impl(
         deps[Api.datasetio],
         deps[Api.datasets],
         deps[Api.inference],
+        deps[Api.models],
     )
     await impl.initialize()
     return impl

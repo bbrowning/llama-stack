@@ -6,9 +6,21 @@
 
 from typing import Any, Dict, List, Optional, Protocol, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from llama_stack.schema_utils import json_schema_type, webmethod
+
+
+@json_schema_type
+class GenerateConfig(BaseModel):
+    """Per-run configuration when running Synthetic Data Generation.
+
+    :param sdg_fn_params: Runtime parameters for the specific SDG Function you want to run
+    """
+    sdg_fn_params: Dict[str, Any] = Field(
+        description="Runtime parameters for the specific SDG Function you want to run",
+        default_factory=dict,
+    )
 
 
 @json_schema_type
@@ -17,6 +29,7 @@ class SyntheticDataGenerationRequest(BaseModel):
 
     dataset_id: str
     sdg_fn_id: str
+    config: GenerateConfig
 
 
 @json_schema_type
@@ -33,4 +46,5 @@ class SyntheticDataGeneration(Protocol):
         self,
         dataset_id: str,
         sdg_fn_id: str,
+        config: Optional[GenerateConfig] = None,
     ) -> Union[SyntheticDataGenerationResponse]: ...

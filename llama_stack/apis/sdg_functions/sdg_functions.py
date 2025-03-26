@@ -23,6 +23,8 @@ class SDGFnParamsType(Enum):
 class InstructLabSDGFnParams(BaseModel):
     type: Literal[SDGFnParamsType.instructlab_sdg.value] = SDGFnParamsType.instructlab_sdg.value
     pipeline_yaml: Optional[str] = None
+    extra_configs: Dict[str, Any] = None
+    chat_templates: Dict[str, str] = None
 
 
 SDGFnParams = register_schema(
@@ -89,6 +91,7 @@ class SDGFunctions(Protocol):
         description: str,
         provider_sdg_fn_id: Optional[str] = None,
         provider_id: Optional[str] = None,
+        params: Optional[SDGFnParams] = None,
     ) -> None: ...
 
     @webmethod(route="/sdg_functions/{sdg_fn_id}", method="DELETE")

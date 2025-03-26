@@ -34,6 +34,7 @@ from llama_stack.apis.scoring_functions import (
 from llama_stack.apis.sdg_functions import (
     ListSDGFunctionsResponse,
     SDGFn,
+    SDGFnParams,
     SDGFunctions,
 )
 from llama_stack.apis.shields import ListShieldsResponse, Shield, Shields
@@ -526,6 +527,7 @@ class SDGFunctionsRoutingTable(CommonRoutingTableImpl, SDGFunctions):
         description: str,
         provider_sdg_fn_id: Optional[str] = None,
         provider_id: Optional[str] = None,
+        params: Optional[SDGFnParams] = None,
     ) -> None:
         if provider_sdg_fn_id is None:
             provider_sdg_fn_id = sdg_fn_id
@@ -541,6 +543,7 @@ class SDGFunctionsRoutingTable(CommonRoutingTableImpl, SDGFunctions):
             description=description,
             provider_resource_id=provider_sdg_fn_id,
             provider_id=provider_id,
+            params=params,
         )
         sdg_fn.provider_id = provider_id
         await self.register_object(sdg_fn)

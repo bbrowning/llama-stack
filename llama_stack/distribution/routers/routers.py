@@ -44,6 +44,7 @@ from llama_stack.apis.scoring import (
 )
 from llama_stack.apis.shields import Shield
 from llama_stack.apis.synthetic_data_generation import (
+    GenerateConfig,
     SyntheticDataGeneration,
     SyntheticDataGenerationResponse,
 )
@@ -592,10 +593,12 @@ class SyntheticDataGenerationRouter(SyntheticDataGeneration):
         self,
         dataset_id: str,
         sdg_fn_id: str,
+        config: Optional[GenerateConfig] = None,
     ) -> SyntheticDataGenerationResponse:
         return await self.routing_table.get_provider_impl(sdg_fn_id).synthetic_data_generate(
             dataset_id=dataset_id,
             sdg_fn_id=sdg_fn_id,
+            config=config,
         )
 
 

@@ -5,12 +5,14 @@
 # the root directory of this source tree.
 
 import asyncio
+import os
 import tempfile
-from typing import List
+from typing import Any, Dict, List, Optional
 
 from datasets import Dataset as HFDataset
 from instructlab.sdg.flow import Flow
 from instructlab.sdg.pipeline import Pipeline
+from instructlab.sdg.registry import PromptRegistry
 from instructlab.sdg.sdg import SDG
 from lls_openai_client.client_adapter import OpenAIClientAdapter
 
@@ -23,6 +25,7 @@ from llama_stack.providers.datatypes import SDGFunctionsProtocolPrivate
 from llama_stack.providers.utils.kvstore import kvstore_impl
 
 from .....apis.synthetic_data_generation.synthetic_data_generation import (
+    GenerateConfig,
     SyntheticDataGenerationResponse,
 )
 from .config import InstructLabSDGConfig
@@ -82,6 +85,7 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
         self,
         dataset_id: str,
         sdg_fn_id: str,
+        config: Optional[GenerateConfig] = None,
     ) -> SyntheticDataGenerationResponse:
         print(f"!!! Running generate on dataset {dataset_id} with sdg_fn {sdg_fn_id}")
         sdg_fn = self.sdg_fns[sdg_fn_id]
@@ -107,6 +111,8 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
         input_ds = HFDataset.from_list(input_rows)
 
         pipeline_yaml = params.pipeline_yaml
+        extra_configs = params.extra_configs
+        chat_templates = params.chat_templates
         server_client = ServerLlamaStackClient(self.inference_api, self.models_api)
         client = OpenAIClientAdapter(server_client)
         output_ds = await asyncio.to_thread(
@@ -114,6 +120,8 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
             client,
             input_ds,
             pipeline_yaml,
+            extra_configs,
+            chat_templates,
         )
 
         # Convert the Dataset to a list, which is risky for large datasets fitting in memory...
@@ -122,19 +130,37 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
 
         return SyntheticDataGenerationResponse(synthetic_data=output_rows, statistics={})
 
+
     def _run_generate(
         self,
         client: OpenAIClientAdapter,
         input_ds: HFDataset,
         pipeline_yaml: str,
+        extra_configs: Dict[str, Any],
+        chat_templates: Dict[str, str],
     ) -> HFDataset:
+        pipeline_yaml_name = "pipeline.yaml"
+        config_files = {
+            pipeline_yaml_name: pipeline_yaml,
+        }
+        if extra_configs:
+            config_files.update(extra_configs)
+
+        self._register_chat_templates(chat_templates)
+
         num_workers = 2
         batch_size = 8
         save_freq = 2
-        with tempfile.NamedTemporaryFile(delete=False, mode="w", encoding="utf-8") as temp_file:
-            temp_file.write(pipeline_yaml)
-            temp_file.close()
-            flow_cfg = Flow(client).get_flow_from_file(temp_file.name)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            for config_file_name, contents in config_files.items():
+                with open(os.path.join(temp_dir, config_file_name), "w", encoding="utf-8") as config_file:
+                    config_file.write(contents)
+
+            flow = Flow(client)
+            # Set the flow's base_path so relative links resolve properly
+            flow.base_path = temp_dir
+            flow_cfg = flow.get_flow_from_file(os.path.join(temp_dir, pipeline_yaml_name))
             sdg = SDG(
                 [Pipeline(flow_cfg)],
                 num_workers=num_workers,
@@ -142,3 +168,12 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
                 save_freq=save_freq,
             )
             return sdg.generate(input_ds)
+
+
+    def _register_chat_templates(
+        self,
+        chat_templates: Dict[str, str],
+    ):
+        if chat_templates:
+            for model_name, chat_template in chat_templates.items():
+                PromptRegistry.register(model_name)(lambda: chat_template)
