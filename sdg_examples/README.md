@@ -9,7 +9,8 @@ to push upstream to Llama Stack itself.
 ## Prerequisites
 
 Ensure you have a vLLM running the `meta-llama/Llama-3.2-3B-Instruct`
-model. Ben uses a command like below on his Nvidia RTX4080 machine:
+model. Ben uses a command like below on his Nvidia RTX4080 machine
+with vLLM 0.7.2:
 
 ```
 vllm serve meta-llama/Llama-3.2-3B-Instruct \
