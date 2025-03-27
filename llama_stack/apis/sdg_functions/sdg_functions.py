@@ -23,8 +23,8 @@ class SDGFnParamsType(Enum):
 class InstructLabSDGFnParams(BaseModel):
     type: Literal[SDGFnParamsType.instructlab_sdg.value] = SDGFnParamsType.instructlab_sdg.value
     pipeline_yaml: Optional[str] = None
-    extra_configs: Dict[str, Any] = None
-    chat_templates: Dict[str, str] = None
+    extra_configs: Optional[Dict[str, str]] = None
+    chat_templates: Optional[Dict[str, str]] = None
 
 
 SDGFnParams = register_schema(
@@ -75,16 +75,16 @@ class ListSDGFunctionsResponse(BaseModel):
 
 
 class SDGFunctions(Protocol):
-    @webmethod(route="/sdg_functions", method="GET")
+    @webmethod(route="/sdg-functions", method="GET")
     async def list_sdg_functions(self) -> ListSDGFunctionsResponse: ...
 
-    @webmethod(route="/sdg_functions/{sdg_fn_id}", method="GET")
+    @webmethod(route="/sdg-functions/{sdg_fn_id}", method="GET")
     async def get_sdg_function(
         self,
         sdg_fn_id: str,
     ) -> SDGFn: ...
 
-    @webmethod(route="/sdg_functions", method="POST")
+    @webmethod(route="/sdg-functions", method="POST")
     async def register_sdg_function(
         self,
         sdg_fn_id: str,
@@ -94,7 +94,7 @@ class SDGFunctions(Protocol):
         params: Optional[SDGFnParams] = None,
     ) -> None: ...
 
-    @webmethod(route="/sdg_functions/{sdg_fn_id}", method="DELETE")
+    @webmethod(route="/sdg-functions/{sdg_fn_id}", method="DELETE")
     async def unregister_sdg_function(
         self,
         sdg_fn_id: str,

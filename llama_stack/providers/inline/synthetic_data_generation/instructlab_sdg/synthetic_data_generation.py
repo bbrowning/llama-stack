@@ -29,7 +29,7 @@ from .....apis.synthetic_data_generation.synthetic_data_generation import (
     SyntheticDataGenerationResponse,
 )
 from .config import InstructLabSDGConfig
-from .server_client import ServerLlamaStackClient
+from .server_client import SyncServerLlamaStackClient
 
 SDG_FNS_PREFIX = "instructlab_sdg_functions:"
 
@@ -87,9 +87,7 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
         sdg_fn_id: str,
         config: Optional[GenerateConfig] = None,
     ) -> SyntheticDataGenerationResponse:
-        print(f"!!! Running generate on dataset {dataset_id} with sdg_fn {sdg_fn_id}")
         sdg_fn = self.sdg_fns[sdg_fn_id]
-        print(f"!!! Found sdg_fn {sdg_fn}")
         if not sdg_fn:
             raise ValueError(f"SDG function {sdg_fn_id} is not registered with this provider.")
 
@@ -97,23 +95,21 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
         if not isinstance(params, InstructLabSDGFnParams):
             raise ValueError(f"SDG function {sdg_fn_id} should use valid InstructLabSDGFnParams.")
 
-        input_rows = await self.datasetio_api.get_rows_paginated(
+        input_rows = await self.datasetio_api.iterrows(
             dataset_id=dataset_id,
-            rows_in_page=-1,
+            limit=-1,
         )
-        if not input_rows.rows:
+        if not input_rows.data:
             raise ValueError(f"Dataset {dataset_id} contains no rows.")
-        input_rows = input_rows.rows
+        input_rows = input_rows.data
 
-        input_rows = [{"output": "foo"}, {"output": "bar"}]
-        print(f"!!! input_rows {input_rows}")
         # Convert the list of input rows to a Dataset
         input_ds = HFDataset.from_list(input_rows)
 
         pipeline_yaml = params.pipeline_yaml
         extra_configs = params.extra_configs
         chat_templates = params.chat_templates
-        server_client = ServerLlamaStackClient(self.inference_api, self.models_api)
+        server_client = SyncServerLlamaStackClient(self.inference_api, self.models_api)
         client = OpenAIClientAdapter(server_client)
         output_ds = await asyncio.to_thread(
             self._run_generate,
@@ -126,7 +122,6 @@ class InstructLabSDGImpl(SDGFunctions, SDGFunctionsProtocolPrivate):
 
         # Convert the Dataset to a list, which is risky for large datasets fitting in memory...
         output_rows = output_ds.to_list()
-        print(f"!!! output_rows {output_rows}")
 
         return SyntheticDataGenerationResponse(synthetic_data=output_rows, statistics={})
 

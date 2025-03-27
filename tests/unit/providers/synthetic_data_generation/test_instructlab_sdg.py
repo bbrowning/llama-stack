@@ -32,7 +32,14 @@ def sdg_config(sqlite_kvstore):
 
 @pytest.fixture
 def mock_datasetio_api():
-    return AsyncMock()
+    mock = MagicMock()
+    mock_data = MagicMock()
+    mock_data.data = [
+        {"output": "foo"},
+        {"output": "baz"},
+    ]
+    mock.iterrows = AsyncMock(return_value=mock_data)
+    return mock
 
 
 @pytest.fixture
@@ -153,7 +160,7 @@ async def test_generate_llmblock(sdg_impl, llmblock_contents, llmblock_config):
     response = await sdg_impl.synthetic_data_generate(
         dataset_id="my-dataset",
         sdg_fn_id="foo",
-        generate_config={
+        config={
             "num_workers": 2,
             "batch_size": 16,
         },
