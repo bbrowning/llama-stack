@@ -28,15 +28,15 @@ The prototype code lives in @bbrowning's forks of `llama-stack`,
 repositories, so clone those and install from source.
 
 ```
-git clone --branch sdg-again https://github.com/bbrowning/llama-stack.git
-git clone --branch sdg-again https://github.com/bbrowning/llama-stack-client-python.git
-git clone https://github.com/bbrowning/llama-stack-openai-client.git
-cd llama-stack
+git clone --branch sdg https://github.com/instructlab/lls-sdg.git
+git clone --branch sdg https://github.com/instructlab/lls-sdg-client-python.git
+git clone https://github.com/instructlab/lls-openai-client.git
+cd lls-sdg
 python -m venv venv
 source venv/bin/activate
 pip install -e .
-pip install -e ../llama-stack-client-python
-pip install -e ../llama-stack-openai-client
+pip install -e ../lls-sdg-client-python
+pip install -e ../lls-openai-client
 llama stack build --template remote-vllm --image-type venv
 ```
 
